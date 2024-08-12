@@ -5,7 +5,16 @@ const port = 3000;
 
 const app = express();
 
-app.use(cors())
+app.use(express.urlencoded({
+    extended: true
+}))
+app.use(express.json())
+// app.use(cors())
+const corsOption = {
+    origin : "http://localhost:5173",
+    credentials : true,
+}
+app.use(cors(corsOption))
 
 const db = mysql.createConnection({
     host: "localhost",
@@ -27,7 +36,11 @@ app.get("/getcard", (req, res) => {
 
 // Add card
 app.post("/addcard", (req, res) => {
-    const sql = `INSERT INTO cards (Question, Answer) values ("what is 2+2", "2+2 is 4")`;
+    const question = req.body.question;
+    const answer = req.body.answer;
+    const category = req.body.category;
+    
+    const sql = `INSERT INTO cards (Question, Answer, Category) values ("${question}", "${answer}", "${category}")`;
     db.query(sql, (err, data) => {
         if (err)
             return res.json(err);
@@ -42,25 +55,26 @@ app.post("/addcard", (req, res) => {
 app.put("/editcard", (req, res) => {
     // const sql = `UPDATE cards SET Question="Who developed python?", Answer="Guido Van Russem" WHERE QuestionId=3`;
     const sql = `UPDATE cards SET Answer="Java is an Object Oriented Programming language" WHERE QuestionId=1`;
-    db.query(sql, (err, data)=>{
-        if(err)
+    db.query(sql, (err, data) => {
+        if (err)
             return res.json(err)
         return res.json({
-            success : true,
-            message : "Card Updated successfully"
+            success: true,
+            message: "Card Updated successfully"
         })
     })
 })
 
 // Delete Card
-app.delete("/deletecard", (req, res)=>{
-    const sql = `DELETE FROM cards WHERE QuestionId=2`;
-    db.query(sql, (err, data)=>{
-        if(err)
+app.delete("/deletecard/:id", (req, res) => {
+    const id = req.params.id;
+    const sql = `DELETE FROM cards WHERE QuestionId=${id}`;
+    db.query(sql, (err, data) => {
+        if (err)
             return res.json(err)
         return res.json({
-            success : true,
-            message : "Card Deleted"
+            success: true,
+            message: "Card Deleted"
         })
     })
 })
