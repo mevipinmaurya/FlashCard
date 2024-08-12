@@ -15,10 +15,6 @@
     --rotate-y: 180deg;
 }
 
-.fCard .front {
-    left: 0;
-}
-
 .fCard .front,
 .fCard .back {
     position: absolute;
